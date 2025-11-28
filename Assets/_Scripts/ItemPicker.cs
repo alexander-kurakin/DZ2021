@@ -2,32 +2,26 @@ using UnityEngine;
 
 public class ItemPicker
 {
-    private IGrabbable _grabbedItem;
+    private IMovable _pickedItem;
 
-    public void PickupItem(Vector3 origin, Vector3 direction, out IGrabbable grabbedItem)
+    public IMovable PickupItem(Vector3 origin, Vector3 direction)
     {
-        grabbedItem = null;
-
         Ray ray = new Ray(origin, direction);
 
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            _grabbedItem = hit.collider.GetComponent<IGrabbable>();
+            _pickedItem = hit.collider.GetComponent<IMovable>();
 
-            if (_grabbedItem != null)
-            {
-                _grabbedItem.Grab();
-                grabbedItem = _grabbedItem;
-            }
+            if (_pickedItem != null)
+                _pickedItem.Grab();
         }
+
+        return _pickedItem;
     }
 
-    public void DropItem()
+    public void DropItem(IMovable itemToDrop)
     {
-        if (_grabbedItem != null)
-        {
-            _grabbedItem.Drop();
-            _grabbedItem = null;
-        }
+        if (itemToDrop != null)
+            itemToDrop.Drop(itemToDrop);
     }   
 }

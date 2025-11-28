@@ -2,25 +2,60 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    private const float YOffset = 1f;
+    private const float GizmosSphereRadius = 0.1f;
+    private const int LeftMouseButtonCode = 0;
+    private const int RightMouseButtonCode = 1;
+
     [SerializeField] private GameObject _groundPlane;
+    [SerializeField] private DragAndDropService _dragAndDropService;
 
-    private ItemPicker _itemPicker;
-    private ItemMover _itemMover;
+    private ExplosionShooter _explosionShooter;
 
-    private IGrabbable _currentItem;
+    private IMovable _currentItem;
     private Vector3 _mouseOnThePlanePosition;
+    private Vector3 _mouseRayOrigin;
+    private Vector3 _mouseRayDirection;
 
     private void Awake()
     {
-        _itemPicker = new ItemPicker();
+        _explosionShooter = GetComponent<ExplosionShooter>();
     }
 
     private void Update()
     {
+        ShootMousePointRay();
+
+        if (Input.GetMouseButtonDown(LeftMouseButtonCode))
+            _currentItem = _dragAndDropService.TryPickUpItem(_mouseRayOrigin, _mouseRayDirection);
+
+        if (_currentItem != null && Input.GetMouseButton(LeftMouseButtonCode))
+            _dragAndDropService.TryDragItem(_mouseOnThePlanePosition);
+
+        if (Input.GetMouseButtonUp(LeftMouseButtonCode))
+        {
+            _dragAndDropService.TryDropItem();
+            _currentItem = null;
+        }
+
+        if (Input.GetMouseButtonDown(RightMouseButtonCode))
+            _explosionShooter.Shoot(_mouseOnThePlanePosition);
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawSphere(_mouseOnThePlanePosition, GizmosSphereRadius);
+    }
+
+    private void ShootMousePointRay()
+    {
         Ray mousePointRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+        _mouseRayOrigin = mousePointRay.origin;
+        _mouseRayDirection = mousePointRay.direction;
 
         Vector3 normal = _groundPlane.transform.up;
-        Vector3 position = _groundPlane.transform.position;
+        Vector3 position = _groundPlane.transform.position + new Vector3(0, YOffset, 0);
 
         Plane groundPlane = new Plane(normal, position);
 
@@ -28,29 +63,5 @@ public class Player : MonoBehaviour
 
         if (groundPlane.Raycast(mousePointRay, out distance))
             _mouseOnThePlanePosition = mousePointRay.GetPoint(distance);
-
-        if (Input.GetMouseButtonDown(0))
-            _itemPicker.PickupItem(mousePointRay.origin, mousePointRay.direction, out _currentItem);
-
-        if (Input.GetMouseButtonUp(0))
-        {
-            _itemPicker.DropItem();
-            _currentItem = null;
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        if (_currentItem != null)
-        {
-            _itemMover = new ItemMover(_currentItem, _mouseOnThePlanePosition);
-            _itemMover.Move();
-        }
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawSphere(_mouseOnThePlanePosition, 0.1f);
     }
 }
