@@ -21,6 +21,6 @@ public class RigidBodyBasedObject : MonoBehaviour, IMovable
 
     public void Drop(IMovable itemToDrop)
     {
-        _rigidbody.isKinematic = false;
+       _rigidbody.isKinematic = false;
     }
 }

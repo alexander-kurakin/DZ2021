@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -6,24 +7,31 @@ public class Player : MonoBehaviour
     private const float GizmosSphereRadius = 0.1f;
     private const int LeftMouseButtonCode = 0;
     private const int RightMouseButtonCode = 1;
+    private const float CameraSwitchInterval = 5f;
 
     [SerializeField] private GameObject _groundPlane;
     [SerializeField] private DragAndDropService _dragAndDropService;
 
     private ExplosionShooter _explosionShooter;
-
+    private CameraSwitcher _cameraSwitcher;
     private IMovable _currentItem;
     private Vector3 _mouseOnThePlanePosition;
     private Vector3 _mouseRayOrigin;
     private Vector3 _mouseRayDirection;
 
+    private float _cameraSwitchTimer;
+
     private void Awake()
     {
         _explosionShooter = GetComponent<ExplosionShooter>();
+        _cameraSwitcher = GetComponent<CameraSwitcher>();
+        _cameraSwitchTimer = CameraSwitchInterval;
     }
 
     private void Update()
     {
+        SwitchCameras();
+
         ShootMousePointRay();
 
         if (Input.GetMouseButtonDown(LeftMouseButtonCode))
@@ -40,6 +48,17 @@ public class Player : MonoBehaviour
 
         if (Input.GetMouseButtonDown(RightMouseButtonCode))
             _explosionShooter.Shoot(_mouseOnThePlanePosition);
+    }
+
+    private void SwitchCameras()
+    {
+        _cameraSwitchTimer -= Time.deltaTime;
+        
+        if (_cameraSwitchTimer <= 0f)
+        {
+            _cameraSwitcher.RandomSwitchCamera();
+            _cameraSwitchTimer = CameraSwitchInterval;
+        }
     }
 
     private void OnDrawGizmos()
