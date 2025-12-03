@@ -1,18 +1,21 @@
-using System;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    private const float YOffset = 1f;
-    private const float GizmosSphereRadius = 0.1f;
+
     private const int LeftMouseButtonCode = 0;
     private const int RightMouseButtonCode = 1;
-    private const float CameraSwitchInterval = 5f;
-    private const float ExplosionRadius = 5f;
-    private const float ExplosionForce = 750f;
 
+    [Header("General settings")]
+    [SerializeField] private float _groundPlandeYOffset = 1f;
+    [SerializeField] private float _mousePointerSphereRadius = 0.1f;
+    [SerializeField] private float _cameraSwitchInterval = 5f;
     [SerializeField] private GameObject _groundPlane;
     [SerializeField] private DragAndDropService _dragAndDropService;
+    [Space]
+    [Header("Shooter settings")]
+    [SerializeField] private float _explosionRadius = 5f;
+    [SerializeField] private float _explosionForce = 750f;
     [SerializeField] private EffectsSpawner _effectsSpawner;
 
     private Shooter _shooter;
@@ -27,9 +30,9 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         _cameraSwitcher = GetComponent<CameraSwitcher>();
-        _cameraSwitchTimer = CameraSwitchInterval;
+        _cameraSwitchTimer = _cameraSwitchInterval;
 
-        _shooter = new Shooter(new RigidBodyBasedExplosion(ExplosionRadius, ExplosionForce));
+        _shooter = new Shooter(new Explosion(_explosionRadius, _explosionForce));
     }
 
     private void Update()
@@ -64,14 +67,14 @@ public class Player : MonoBehaviour
         if (_cameraSwitchTimer <= 0f)
         {
             _cameraSwitcher.RandomSwitchCamera();
-            _cameraSwitchTimer = CameraSwitchInterval;
+            _cameraSwitchTimer = _cameraSwitchInterval;
         }
     }
 
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.blue;
-        Gizmos.DrawSphere(_mouseOnThePlanePosition, GizmosSphereRadius);
+        Gizmos.DrawSphere(_mouseOnThePlanePosition, _mousePointerSphereRadius);
     }
 
     private void ShootMousePointRay()
@@ -81,7 +84,7 @@ public class Player : MonoBehaviour
         _mouseRayDirection = mousePointRay.direction;
 
         Vector3 normal = _groundPlane.transform.up;
-        Vector3 position = _groundPlane.transform.position + new Vector3(0, YOffset, 0);
+        Vector3 position = _groundPlane.transform.position + new Vector3(0, _groundPlandeYOffset, 0);
 
         Plane groundPlane = new Plane(normal, position);
 

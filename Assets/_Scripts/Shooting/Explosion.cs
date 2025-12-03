@@ -1,11 +1,11 @@
 using UnityEngine;
 
-public class RigidBodyBasedExplosion : IShootEffect
+public class Explosion : IShootEffect
 {
     private float _explosionRadius;
     private float _explosionForce;
 
-    public RigidBodyBasedExplosion(float explosionRadius, float explosionForce) 
+    public Explosion(float explosionRadius, float explosionForce) 
     { 
         _explosionRadius = explosionRadius;
         _explosionForce = explosionForce;
@@ -17,11 +17,9 @@ public class RigidBodyBasedExplosion : IShootEffect
 
         foreach (Collider target in targets)
         {
-            Rigidbody rigidbody = target.GetComponent<Rigidbody>();
-            if (rigidbody != null)
+            if (target.TryGetComponent<IExplodable>(out IExplodable explodable))
             {
-                Vector3 direction = target.transform.position - shootPosition;
-                rigidbody.AddForce(direction.normalized * _explosionForce);
+                explodable.OnExplode(shootPosition, _explosionForce);
             }
         }
     }

@@ -22,6 +22,6 @@ public class ItemPicker
     public void DropItem(IMovable itemToDrop)
     {
         if (itemToDrop != null)
-            itemToDrop.Drop(itemToDrop);
+            itemToDrop.Drop();
     }   
 }

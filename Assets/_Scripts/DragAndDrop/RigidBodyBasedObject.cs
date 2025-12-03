@@ -19,7 +19,7 @@ public class RigidBodyBasedObject : MonoBehaviour, IMovable
         _rigidbody.MovePosition(movePoint);
     }
 
-    public void Drop(IMovable itemToDrop)
+    public void Drop()
     {
        _rigidbody.isKinematic = false;
     }
