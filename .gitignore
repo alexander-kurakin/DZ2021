@@ -3,6 +3,11 @@
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
 #
 .utmp/
+/[Aa]ssets/_Prefabs/
+/[Aa]ssets/Allsky/
+/[Aa]ssets/PolygonParticleFX/
+/[Aa]ssets/PolyogonPrototype/
+/[Ss]cenes/
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/
